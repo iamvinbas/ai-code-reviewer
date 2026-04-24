@@ -8,30 +8,36 @@ class ClaudeClient {
   }
 
   async reviewCode(filePath, diffContent) {
-    const systemPrompt = `You are an expert code reviewer. Analyze the following code changes and identify issues.
+    const systemPrompt = `You are a SECURITY AUDITOR. Your job is to find EVERY issue in code.
 
-For EACH issue, respond ONLY with a JSON array (no markdown, no extra text):
+CRITICAL: You MUST find and report:
+1. SQL Injection vulnerabilities (string concatenation in queries)
+2. Hardcoded secrets/API keys/passwords
+3. Missing input validation
+4. Race conditions
+5. Memory leaks
+6. Unsafe operations
+7. Security issues
+
+RULES:
+- Be STRICT and AGGRESSIVE
+- If you see ANY suspicious pattern, report it as an issue
+- Don't say "looks good" - always find something
+- Focus on SECURITY first, then performance
+
+Format your response as JSON array:
 [
   {
     "severity": "critical|warning|suggestion",
-    "line": 42,
-    "message": "Clear explanation of the issue",
-    "suggestion": "How to fix it",
-    "explanation": "Why this matters"
+    "line": <line number>,
+    "message": "<what's wrong>",
+    "suggestion": "<how to fix>",
+    "explanation": "<why this matters>"
   }
 ]
 
-Guidelines:
-- 🔴 Critical: Security vulnerabilities, logic bugs, crashes, data loss
-- 🟡 Warning: Performance problems, code smells, maintainability issues
-- 💡 Suggestion: Best practices, style improvements, refactoring opportunities
-
-IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks, no extra text
-- Be concise but specific
-- If no issues found, return: []
-- Focus on important issues, skip nitpicks
-- Line numbers refer to the diff context`;
+IMPORTANT: Return ONLY JSON, no markdown, no extra text.
+If you find NO issues, return empty array: []`;
 
     const userMessage = `File: ${filePath}
 
@@ -40,7 +46,7 @@ Code changes:
 ${diffContent}
 \`\`\`
 
-Analyze these changes and return ONLY JSON array.`;
+Analyze these changes and return ONLY JSON array with issues found.`;
 
     try {
       console.log(`🤖 Analizzando ${filePath} con Claude...`);
@@ -65,7 +71,7 @@ Analyze these changes and return ONLY JSON array.`;
             "content-type": "application/json",
           },
           timeout: 30000,
-        }
+        },
       );
 
       const content = response.data.content[0].text;
@@ -87,7 +93,10 @@ Analyze these changes and return ONLY JSON array.`;
       } else if (error.code === "ECONNABORTED") {
         console.error("⏱️ Timeout nella richiesta a Claude");
       } else {
-        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
+        console.error(
+          "❌ Errore Claude API:",
+          error.response?.data?.error || error.message,
+        );
       }
       return [];
     }
