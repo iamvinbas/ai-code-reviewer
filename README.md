@@ -32,6 +32,16 @@ The bot uses the `GITHUB_TOKEN` — a temporary token that GitHub automatically 
 
 If you ever need to inspect it: **Settings → Actions → General → Workflow permissions**.
 
+**For local testing only** — if you want to run the bot on your machine instead of via GitHub Actions, you need a Personal Access Token (PAT):
+
+1. Go to **https://github.com/settings/tokens/new**
+2. Give it a name (e.g. `ai-code-reviewer-local`)
+3. Select scopes: `repo` + `workflow` + `models` (if available)
+4. Click **Generate token** and copy it
+5. Paste it in your `.env` file as `GITHUB_TOKEN=ghp_your_token_here`
+
+The PAT is only needed locally. In GitHub Actions, everything is automatic.
+
 ## Example
 
 ![Inline comment on SQL injection](assets/inline-comment.png)
