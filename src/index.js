@@ -7,12 +7,8 @@ import CodeAnalyzer from "./code-analyzer.js";
 async function main() {
   console.log("\n🤖 AI Code Reviewer Bot - Starting...\n");
 
-  const {
-    GITHUB_TOKEN,
-    CLAUDE_API_KEY,
-    GITHUB_REPOSITORY,
-    GITHUB_EVENT_PATH,
-  } = process.env;
+  const { GITHUB_TOKEN, CLAUDE_API_KEY, GITHUB_REPOSITORY, GITHUB_EVENT_PATH } =
+    process.env;
 
   if (!GITHUB_TOKEN) {
     throw new Error("❌ Missing GITHUB_TOKEN");
@@ -68,26 +64,28 @@ async function main() {
       owner,
       repo,
       pull_number,
-      commitSha
+      commitSha,
     );
 
     if (issues.length > 0) {
-      console.log(`\n✅ Trovati ${issues.length} problemi, posting commenti...`);
+      console.log(
+        `\n✅ Trovati ${issues.length} problemi, posting commenti...`,
+      );
       await analyzer.postReviewComments(
         owner,
         repo,
         pull_number,
         issues,
-        commitSha
+        commitSha,
       );
     } else {
       console.log("\n✅ Nessun problema trovato! PR looks good! 🎉");
-      
+
       await github.postGeneralComment(
         owner,
         repo,
         pull_number,
-        `## ✅ AI Code Review Complete\n\nNo issues found! Your code looks great! 🎉\n\n*Powered by AI Code Reviewer Bot* ⚙️`
+        `## ✅ AI Code Review Complete\n\nNo issues found! Your code looks great! 🎉\n\n*Powered by AI Code Reviewer Bot* ⚙️`,
       );
     }
 
@@ -102,7 +100,7 @@ async function main() {
         owner,
         repo,
         pull_number,
-        `⚠️ **AI Code Review Error**\n\nAn error occurred during review. Check [workflow logs](https://github.com/${GITHUB_REPOSITORY}/actions) for details.`
+        `⚠️ **AI Code Review Error**\n\nAn error occurred during review. Check [workflow logs](https://github.com/${GITHUB_REPOSITORY}/actions) for details.`,
       );
     } catch (e) {
       console.error("Couldn't post error comment:", e.message);
