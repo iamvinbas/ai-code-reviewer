@@ -1,4 +1,4 @@
-const { Octokit } = require("octokit");
+import { Octokit } from "octokit";
 
 class GitHubClient {
   constructor(token) {
@@ -6,12 +6,9 @@ class GitHubClient {
     this.commitSha = null;
   }
 
-  /**
-   * Scarica tutti i file modificati nella PR
-   */
   async getPRChanges(owner, repo, pull_number) {
     console.log(`📂 Scaricando cambiamenti PR #${pull_number}...`);
-
+    
     try {
       const { data: files } = await this.octokit.rest.pulls.listFiles({
         owner,
@@ -22,7 +19,6 @@ class GitHubClient {
       const changes = [];
 
       for (const file of files) {
-        // Salta file binari e non-codice
         if (this.shouldSkipFile(file.filename)) {
           console.log(`⏭️  Skipping ${file.filename}`);
           continue;
@@ -30,15 +26,13 @@ class GitHubClient {
 
         changes.push({
           filename: file.filename,
-          patch: file.patch, // Diff completo
+          patch: file.patch,
           additions: file.additions,
           deletions: file.deletions,
           changes: file.changes,
         });
 
-        console.log(
-          `✅ Aggiunto: ${file.filename} (+${file.additions}/-${file.deletions})`,
-        );
+        console.log(`✅ Aggiunto: ${file.filename} (+${file.additions}/-${file.deletions})`);
       }
 
       console.log(`\n📊 Totale file da revisionare: ${changes.length}`);
@@ -49,24 +43,21 @@ class GitHubClient {
     }
   }
 
-  /**
-   * Determina se un file deve essere saltato
-   */
   shouldSkipFile(filename) {
     const skipPatterns = [
-      /\.lock$/, // package-lock.json, yarn.lock
-      /\.min\.js$/, // File minimizzati
+      /\.lock$/,
+      /\.min\.js$/,
       /\.min\.css$/,
-      /node_modules/, // Dipendenze
-      /dist\//, // Build folder
+      /node_modules/,
+      /dist\//,
       /build\//,
-      /\.md$/, // Markdown
-      /\.yml$/, // YAML config
+      /\.md$/,
+      /\.yml$/,
       /\.yaml$/,
-      /\.json$/, // JSON (config, package.json)
-      /\.lock$/, // Lock files
-      /\.svg$/, // SVG (spesso auto-generati)
-      /\.png$/, // Immagini
+      /\.json$/,
+      /\.lock$/,
+      /\.svg$/,
+      /\.png$/,
       /\.jpg$/,
       /\.gif$/,
     ];
@@ -74,12 +65,8 @@ class GitHubClient {
     return skipPatterns.some((pattern) => pattern.test(filename));
   }
 
-  /**
-   * Posta un commento su una linea specifica della PR
-   */
   async postComment(owner, repo, pull_number, body, line, path) {
     try {
-      // Ottieni l'ultimo commit della PR
       const { data: prData } = await this.octokit.rest.pulls.get({
         owner,
         repo,
@@ -102,15 +89,11 @@ class GitHubClient {
     } catch (error) {
       console.error(
         `❌ Errore nel postare commento su ${path}:${line}:`,
-        error.message,
+        error.message
       );
-      // Non throw, continua con altri commenti
     }
   }
 
-  /**
-   * Posta un commento generale sulla PR
-   */
   async postGeneralComment(owner, repo, pull_number, body) {
     try {
       console.log(`📝 Postando commento generale sulla PR...`);
@@ -127,12 +110,9 @@ class GitHubClient {
     }
   }
 
-  /**
-   * Utility: sleep
-   */
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
-module.exports = GitHubClient;
+export default GitHubClient;

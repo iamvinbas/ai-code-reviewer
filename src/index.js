@@ -1,17 +1,15 @@
-require("dotenv").config();
-const fs = require("fs");
-const GitHubClient = require("./github-client");
-const ClaudeClient = require("./claude-client");
-const CodeAnalyzer = require("./code-analyzer");
+import("dotenv/config");
+import fs from "fs";
+import GitHubClient from "./github-client.js";
+import ClaudeClient from "./claude-client.js";
+import CodeAnalyzer from "./code-analyzer.js";
 
 async function main() {
   console.log("\n🤖 AI Code Reviewer Bot - Starting...\n");
 
-  // Leggi variabili d'ambiente
   const { GITHUB_TOKEN, CLAUDE_API_KEY, GITHUB_REPOSITORY, GITHUB_EVENT_PATH } =
     process.env;
 
-  // Validazione
   if (!GITHUB_TOKEN) {
     throw new Error("❌ Missing GITHUB_TOKEN");
   }
@@ -32,7 +30,6 @@ async function main() {
   console.log(`✅ Claude API Key: configured`);
   console.log(`📦 Repository: ${GITHUB_REPOSITORY}`);
 
-  // Parse GitHub event
   let event;
   try {
     const eventContent = fs.readFileSync(GITHUB_EVENT_PATH, "utf8");
@@ -42,7 +39,6 @@ async function main() {
     process.exit(1);
   }
 
-  // Estrai dati dalla PR
   const pullRequest = event.pull_request;
   if (!pullRequest) {
     console.log("ℹ️  No pull request in event, skipping");
@@ -59,13 +55,11 @@ async function main() {
   console.log(`   - Author: @${pullRequest.user.login}`);
   console.log(`   - Commit: ${commitSha.substring(0, 7)}`);
 
-  // Inizializza client
   const github = new GitHubClient(GITHUB_TOKEN);
   const claude = new ClaudeClient(CLAUDE_API_KEY);
   const analyzer = new CodeAnalyzer(github, claude);
 
   try {
-    // 1. Analizza la PR
     const issues = await analyzer.analyzePR(
       owner,
       repo,
@@ -73,7 +67,6 @@ async function main() {
       commitSha,
     );
 
-    // 2. Posta commenti se ci sono problemi
     if (issues.length > 0) {
       console.log(
         `\n✅ Trovati ${issues.length} problemi, posting commenti...`,
@@ -88,7 +81,6 @@ async function main() {
     } else {
       console.log("\n✅ Nessun problema trovato! PR looks good! 🎉");
 
-      // Posta commento positivo
       await github.postGeneralComment(
         owner,
         repo,
@@ -103,13 +95,12 @@ async function main() {
     console.error("\n❌ Errore durante la review:", error.message);
     console.error(error.stack);
 
-    // Prova a postare un commento di errore
     try {
       await github.postGeneralComment(
         owner,
         repo,
         pull_number,
-        `⚠️ **AI Code Review Error**\n\nErrr occurred during review. Check [workflow logs](https://github.com/${GITHUB_REPOSITORY}/actions) for details.`,
+        `⚠️ **AI Code Review Error**\n\nAn error occurred during review. Check [workflow logs](https://github.com/${GITHUB_REPOSITORY}/actions) for details.`,
       );
     } catch (e) {
       console.error("Couldn't post error comment:", e.message);
@@ -119,7 +110,6 @@ async function main() {
   }
 }
 
-// Esegui
 main().catch((error) => {
   console.error("Fatal error:", error.message);
   process.exit(1);
