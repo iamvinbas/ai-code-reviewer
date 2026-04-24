@@ -20,7 +20,11 @@ class CodeAnalyzer {
 
     for (const file of changes) {
       try {
-        const issues = await this.claude.reviewCode(file.filename, file.patch);
+        if (!file.patch) {
+        console.log(`⏭️  No patch for ${file.filename}, skipping`);
+        continue;
+      }
+      const issues = await this.claude.reviewCode(file.filename, file.patch);
 
         for (const issue of issues) {
           allIssues.push({

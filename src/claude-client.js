@@ -4,7 +4,7 @@ class ClaudeClient {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.baseURL = "https://api.anthropic.com/v1";
-    this.model = "claude-3-5-sonnet-20241022";
+    this.model = "claude-sonnet-4-6";
   }
 
   async reviewCode(filePath, diffContent) {
@@ -72,7 +72,8 @@ Analyze these changes and return ONLY JSON array.`;
 
       let issues = [];
       try {
-        issues = JSON.parse(content);
+        const cleaned = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+        issues = JSON.parse(cleaned);
         console.log(`✅ Trovati ${issues.length} problemi in ${filePath}`);
       } catch (e) {
         console.warn(`⚠️ Errore nel parsing della risposta Claude:`);
