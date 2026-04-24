@@ -8,57 +8,36 @@ class ClaudeClient {
   }
 
   async reviewCode(filePath, diffContent) {
-    const systemPrompt = `You are a PROFESSIONAL SECURITY CODE REVIEWER.
+    const systemPrompt = `You are an expert code reviewer. Analyze code changes.
 
-YOUR JOB: Find EVERY security issue, bug, and code smell.
+Find and report:
+- Security issues (SQL injection, hardcoded secrets)
+- Logic bugs
+- Performance problems
+- Code quality issues
 
-CRITICAL - You MUST report:
-1. SQL Injection (string concatenation in queries)
-2. Hardcoded secrets/API keys/passwords
-3. Missing input validation
-4. Unsafe operations
-5. Poor error handling
-6. Performance issues
-
-EXAMPLES OF ISSUES YOU MUST FIND:
-- "SELECT * FROM users WHERE id = " + userInput  ← SQL INJECTION
-- const API = "sk-123456"  ← HARDCODED SECRET
-- function process(x) { doSomething(x); }  ← NO VALIDATION
-
-YOUR RESPONSE FORMAT:
-Return a JSON array. Each issue object MUST have:
-- severity: "critical" | "warning" | "suggestion"
-- line: line number (integer)
-- message: short description of the issue
-- suggestion: how to fix it
-- explanation: why it matters
-
-EXAMPLE RESPONSE:
+Return ONLY JSON array:
 [
   {
-    "severity": "critical",
-    "line": 5,
-    "message": "SQL Injection vulnerability - user input concatenated into SQL query",
-    "suggestion": "Use parameterized queries: database.query('SELECT * FROM users WHERE id = ?', [id])",
-    "explanation": "Concatenating user input into SQL allows attackers to execute arbitrary queries"
+    "severity": "critical|warning|suggestion",
+    "line": 42,
+    "message": "Issue description",
+    "suggestion": "How to fix",
+    "explanation": "Why it matters"
   }
 ]
 
-RULES:
-- Return ONLY valid JSON array
-- No markdown, no code blocks, no explanation text
-- If no issues, return: []
-- Be thorough and strict
-- Report security issues first
+If no issues, return empty array: []`;
 
-CODE TO REVIEW:`;
+    const userMessage = `File: ${filePath}
 
-    const userMessage = `${diffContent}
+Code:
+${diffContent}
 
-Analyze this code. Return JSON array with issues.`;
+Return JSON array with issues found.`;
 
     try {
-      console.log(`🤖 Analizzando ${filePath} con Claude...`);
+      console.log(`🤖 Analyzing ${filePath}...`);
 
       const response = await axios.post(
         `${this.baseURL}/messages`,
@@ -84,26 +63,19 @@ Analyze this code. Return JSON array with issues.`;
       );
 
       const content = response.data.content[0].text;
-
       let issues = [];
+      
       try {
         issues = JSON.parse(content);
-        console.log(`✅ Trovati ${issues.length} problemi in ${filePath}`);
+        console.log(`✅ Found ${issues.length} issues in ${filePath}`);
       } catch (e) {
-        console.warn(`⚠️ Errore nel parsing della risposta Claude:`);
-        console.warn(content);
+        console.warn(`Warning: Could not parse Claude response`);
         issues = [];
       }
 
       return issues;
     } catch (error) {
-      if (error.response?.status === 429) {
-        console.error("⏳ Rate limit raggiunto, aspetta un momento...");
-      } else if (error.code === "ECONNABORTED") {
-        console.error("⏱️ Timeout nella richiesta a Claude");
-      } else {
-        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
-      }
+      console.error("Claude API error:", error.message);
       return [];
     }
   }
