@@ -21,6 +21,17 @@ Click **Fork** at the top of this page. Done. The bot is ready on your fork imme
 
 No secrets, no tokens, no billing.
 
+## How authentication works
+
+The bot uses the `GITHUB_TOKEN` — a temporary token that GitHub automatically generates for every workflow run. You don't create it, store it, or pay for it.
+
+- **It's scoped to your repo only** — no access to other repos or accounts
+- **It expires after each run** — can't be leaked or reused
+- **Each user gets their own** — forking the repo gives every user their independent token
+- **No setup required** — GitHub injects it automatically via `${{ secrets.GITHUB_TOKEN }}`
+
+If you ever need to inspect it: **Settings → Actions → General → Workflow permissions**.
+
 ## Example
 
 ![Inline comment on SQL injection](assets/inline-comment.png)
