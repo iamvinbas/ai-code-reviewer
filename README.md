@@ -68,6 +68,8 @@ That's it. No secrets, no tokens, no billing.
 
 ## Example
 
+![Inline comment on SQL injection](assets/inline-comment.png)
+
 ![AI Code Review Summary](assets/review-summary.png)
 
 ## What it detects
