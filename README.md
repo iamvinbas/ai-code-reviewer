@@ -6,65 +6,20 @@ Automatic AI code review on every pull request. No API keys. No cost. Powered by
 
 When you open a PR, the bot reviews every changed file and posts inline comments for bugs, security issues, and bad practices. PRs with critical issues fail the check.
 
-## Setup — 1 step
+## Setup
 
-Copy this file into your repository at `.github/workflows/review.yml`:
+### Option A — Fork (easiest)
 
-```yaml
-name: AI Code Review
+Click **Fork** at the top of this page. Done. The bot is ready on your fork immediately — no configuration needed.
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-      - ".gitignore"
+### Option B — Add to an existing repository
 
-permissions:
-  pull-requests: write
-  contents: read
-  models: read
+1. Copy the `src/` folder and `package.json` from this repo into your project root
+2. Copy `.github/workflows/review.yml` into your project
+3. Run `npm install` once to install dependencies
+4. Push to GitHub — the bot activates on the next PR
 
-jobs:
-  review:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run AI Code Review
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_EVENT_PATH: ${{ github.event_path }}
-        run: node src/index.js
-
-      - name: Comment on failure
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '⚠️ AI Code Review encountered an error. Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
-            })
-```
-
-That's it. No secrets, no tokens, no billing.
+No secrets, no tokens, no billing.
 
 ## Example
 
