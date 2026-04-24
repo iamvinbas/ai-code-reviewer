@@ -3,50 +3,59 @@ import axios from "axios";
 class ClaudeClient {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.baseURL = "https://api.anthropic.com/v1";
+    this.baseURL = "https://api.anthropic.com/v1"\;
     this.model = "claude-3-5-sonnet-20241022";
   }
 
   async reviewCode(filePath, diffContent) {
-    const systemPrompt = `You are a SECURITY AUDITOR. Your job is to find EVERY issue in code.
+    const systemPrompt = `You are a PROFESSIONAL SECURITY CODE REVIEWER.
 
-CRITICAL: You MUST find and report:
-1. SQL Injection vulnerabilities (string concatenation in queries)
+YOUR JOB: Find EVERY security issue, bug, and code smell.
+
+CRITICAL - You MUST report:
+1. SQL Injection (string concatenation in queries)
 2. Hardcoded secrets/API keys/passwords
 3. Missing input validation
-4. Race conditions
-5. Memory leaks
-6. Unsafe operations
-7. Security issues
+4. Unsafe operations
+5. Poor error handling
+6. Performance issues
 
-RULES:
-- Be STRICT and AGGRESSIVE
-- If you see ANY suspicious pattern, report it as an issue
-- Don't say "looks good" - always find something
-- Focus on SECURITY first, then performance
+EXAMPLES OF ISSUES YOU MUST FIND:
+- "SELECT * FROM users WHERE id = " + userInput  ← SQL INJECTION
+- const API = "sk-123456"  ← HARDCODED SECRET
+- function process(x) { doSomething(x); }  ← NO VALIDATION
 
-Format your response as JSON array:
+YOUR RESPONSE FORMAT:
+Return a JSON array. Each issue object MUST have:
+- severity: "critical" | "warning" | "suggestion"
+- line: line number (integer)
+- message: short description of the issue
+- suggestion: how to fix it
+- explanation: why it matters
+
+EXAMPLE RESPONSE:
 [
   {
-    "severity": "critical|warning|suggestion",
-    "line": <line number>,
-    "message": "<what's wrong>",
-    "suggestion": "<how to fix>",
-    "explanation": "<why this matters>"
+    "severity": "critical",
+    "line": 5,
+    "message": "SQL Injection vulnerability - user input concatenated into SQL query",
+    "suggestion": "Use parameterized queries: database.query('SELECT * FROM users WHERE id = ?', [id])",
+    "explanation": "Concatenating user input into SQL allows attackers to execute arbitrary queries"
   }
 ]
 
-IMPORTANT: Return ONLY JSON, no markdown, no extra text.
-If you find NO issues, return empty array: []`;
+RULES:
+- Return ONLY valid JSON array
+- No markdown, no code blocks, no explanation text
+- If no issues, return: []
+- Be thorough and strict
+- Report security issues first
 
-    const userMessage = `File: ${filePath}
+CODE TO REVIEW:`;
 
-Code changes:
-\`\`\`
-${diffContent}
-\`\`\`
+    const userMessage = `${diffContent}
 
-Analyze these changes and return ONLY JSON array with issues found.`;
+Analyze this code. Return JSON array with issues.`;
 
     try {
       console.log(`🤖 Analizzando ${filePath} con Claude...`);
@@ -71,7 +80,7 @@ Analyze these changes and return ONLY JSON array with issues found.`;
             "content-type": "application/json",
           },
           timeout: 30000,
-        },
+        }
       );
 
       const content = response.data.content[0].text;
@@ -93,10 +102,7 @@ Analyze these changes and return ONLY JSON array with issues found.`;
       } else if (error.code === "ECONNABORTED") {
         console.error("⏱️ Timeout nella richiesta a Claude");
       } else {
-        console.error(
-          "❌ Errore Claude API:",
-          error.response?.data?.error || error.message,
-        );
+        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
       }
       return [];
     }
