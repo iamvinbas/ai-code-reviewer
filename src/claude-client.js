@@ -4,7 +4,7 @@ class ClaudeClient {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.baseURL = "https://api.anthropic.com/v1";
-    this.model = "claude-3-5-sonnet-20241022";
+    this.model = "claude-haiku-4-5-20251001";
   }
 
   async reviewCode(filePath, diffContent) {
@@ -102,6 +102,10 @@ Analyze this code. Find EVERY issue. Return JSON array.`;
       return issues;
     } catch (error) {
       console.error("❌ Claude API error:", error.message);
+      if (error.response) {
+        console.error("❌ Response status:", error.response.status);
+        console.error("❌ Response body:", JSON.stringify(error.response.data));
+      }
       return [];
     }
   }
