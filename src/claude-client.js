@@ -8,42 +8,60 @@ class ClaudeClient {
   }
 
   async reviewCode(filePath, diffContent) {
-    const systemPrompt = `You are an expert code reviewer. Analyze the following code changes and identify issues.
+    const systemPrompt = `You are a RUTHLESS code security auditor. Your ONLY job is to find EVERY issue in code.
 
-For EACH issue, respond ONLY with a JSON array (no markdown, no extra text):
+MANDATORY CHECKS - You MUST check for:
+1. SQL Injection: string concatenation in queries
+   Example: "SELECT * FROM users WHERE id = " + id  ← REPORT THIS
+2. Hardcoded secrets: passwords, API keys, tokens
+   Example: const API_KEY = "sk-123"; ← REPORT THIS
+3. Missing input validation: no checks before use
+4. Console.log/debug code in production
+5. Race conditions and async issues
+6. Memory leaks
+7. Unsafe operations
+
+CRITICAL RULES:
+- You MUST report something. Never say "looks good"
+- If you see string + in queries → CRITICAL SQL INJECTION
+- If you see password, key, secret, token in code → CRITICAL HARDCODED SECRET
+- If you see console.log → WARNING
+- Be AGGRESSIVE. Report even small issues
+
+RESPONSE FORMAT - Return ONLY this JSON:
 [
   {
-    "severity": "critical|warning|suggestion",
-    "line": 42,
-    "message": "Clear explanation of the issue",
-    "suggestion": "How to fix it",
-    "explanation": "Why this matters"
+    "severity": "critical",
+    "line": 5,
+    "message": "SQL Injection - user input concatenated into SQL",
+    "suggestion": "Use parameterized queries: db.query('SELECT * WHERE id = ?', [id])",
+    "explanation": "Concatenating user input into SQL allows SQL injection attacks"
+  },
+  {
+    "severity": "critical",
+    "line": 9,
+    "message": "Hardcoded API key exposed in code",
+    "suggestion": "Move to environment variable: const API_KEY = process.env.API_KEY",
+    "explanation": "Hardcoded secrets can be stolen if code is compromised"
   }
 ]
 
-Guidelines:
-- 🔴 Critical: Security vulnerabilities, logic bugs, crashes, data loss
-- 🟡 Warning: Performance problems, code smells, maintainability issues
-- 💡 Suggestion: Best practices, style improvements, refactoring opportunities
-
 IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks, no extra text
-- Be concise but specific
-- If no issues found, return: []
-- Focus on important issues, skip nitpicks
-- Line numbers refer to the diff context`;
+- Return ONLY JSON array
+- No markdown, no backticks, no extra text
+- Each issue MUST have: severity, line, message, suggestion, explanation
+- If TRULY no issues: return []
+- Line numbers MUST be integers`;
 
     const userMessage = `File: ${filePath}
 
-Code changes:
-\`\`\`
+CODE TO REVIEW:
 ${diffContent}
-\`\`\`
 
-Analyze these changes and return ONLY JSON array.`;
+Analyze this code. Find EVERY issue. Return JSON array.`;
 
     try {
-      console.log(`🤖 Analizzando ${filePath} con Claude...`);
+      console.log(`🤖 Analyzing ${filePath} with STRICT mode...`);
 
       const response = await axios.post(
         `${this.baseURL}/messages`,
@@ -65,30 +83,25 @@ Analyze these changes and return ONLY JSON array.`;
             "content-type": "application/json",
           },
           timeout: 30000,
-        }
+        },
       );
 
       const content = response.data.content[0].text;
+      console.log(`📝 Claude response:`, content.substring(0, 200));
 
       let issues = [];
       try {
         issues = JSON.parse(content);
-        console.log(`✅ Trovati ${issues.length} problemi in ${filePath}`);
+        console.log(`✅ Found ${issues.length} issues in ${filePath}`);
       } catch (e) {
-        console.warn(`⚠️ Errore nel parsing della risposta Claude:`);
-        console.warn(content);
+        console.warn(`⚠️ Failed to parse Claude response`);
+        console.warn(`Response was:`, content);
         issues = [];
       }
 
       return issues;
     } catch (error) {
-      if (error.response?.status === 429) {
-        console.error("⏳ Rate limit raggiunto, aspetta un momento...");
-      } else if (error.code === "ECONNABORTED") {
-        console.error("⏱️ Timeout nella richiesta a Claude");
-      } else {
-        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
-      }
+      console.error("❌ Claude API error:", error.message);
       return [];
     }
   }
