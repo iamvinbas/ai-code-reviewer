@@ -1,21 +1,16 @@
 import("dotenv/config");
 import fs from "fs";
 import GitHubClient from "./github-client.js";
-import ClaudeClient from "./claude-client.js";
+import AIClient from "./claude-client.js";
 import CodeAnalyzer from "./code-analyzer.js";
 
 async function main() {
   console.log("\n🤖 AI Code Reviewer Bot - Starting...\n");
 
-  const { GITHUB_TOKEN, CLAUDE_API_KEY, GITHUB_REPOSITORY, GITHUB_EVENT_PATH } =
-    process.env;
+  const { GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH } = process.env;
 
   if (!GITHUB_TOKEN) {
     throw new Error("❌ Missing GITHUB_TOKEN");
-  }
-
-  if (!CLAUDE_API_KEY) {
-    throw new Error("❌ Missing CLAUDE_API_KEY");
   }
 
   if (!GITHUB_EVENT_PATH) {
@@ -27,7 +22,6 @@ async function main() {
   }
 
   console.log(`✅ GitHub Token: configured`);
-  console.log(`✅ Claude API Key: configured`);
   console.log(`📦 Repository: ${GITHUB_REPOSITORY}`);
 
   let event;
@@ -56,8 +50,8 @@ async function main() {
   console.log(`   - Commit: ${commitSha.substring(0, 7)}`);
 
   const github = new GitHubClient(GITHUB_TOKEN);
-  const claude = new ClaudeClient(CLAUDE_API_KEY);
-  const analyzer = new CodeAnalyzer(github, claude);
+  const ai = new AIClient(GITHUB_TOKEN);
+  const analyzer = new CodeAnalyzer(github, ai);
 
   try {
     const issues = await analyzer.analyzePR(

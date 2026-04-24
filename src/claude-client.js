@@ -1,10 +1,10 @@
 import axios from "axios";
 
-class ClaudeClient {
-  constructor(apiKey) {
-    this.apiKey = apiKey;
-    this.baseURL = "https://api.anthropic.com/v1";
-    this.model = "claude-3-5-sonnet-20241022";
+class AIClient {
+  constructor(githubToken) {
+    this.token = githubToken;
+    this.baseURL = "https://models.inference.ai.azure.com";
+    this.model = "gpt-4o-mini";
   }
 
   async reviewCode(filePath, diffContent) {
@@ -22,12 +22,12 @@ For EACH issue, respond ONLY with a JSON array (no markdown, no extra text):
 ]
 
 Guidelines:
-- 🔴 Critical: Security vulnerabilities, logic bugs, crashes, data loss
-- 🟡 Warning: Performance problems, code smells, maintainability issues
-- 💡 Suggestion: Best practices, style improvements, refactoring opportunities
+- critical: Security vulnerabilities, logic bugs, crashes, data loss
+- warning: Performance problems, code smells, maintainability issues
+- suggestion: Best practices, style improvements, refactoring opportunities
 
 IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks, no extra text
+- Return ONLY valid JSON array, no markdown, no code blocks, no extra text
 - Be concise but specific
 - If no issues found, return: []
 - Focus on important issues, skip nitpicks
@@ -40,42 +40,40 @@ Code changes:
 ${diffContent}
 \`\`\`
 
-Analyze these changes and return ONLY JSON array.`;
+Analyze these changes and return ONLY a JSON array.`;
 
     try {
-      console.log(`🤖 Analizzando ${filePath} con Claude...`);
+      console.log(`🤖 Analizzando ${filePath}...`);
 
       const response = await axios.post(
-        `${this.baseURL}/messages`,
+        `${this.baseURL}/chat/completions`,
         {
           model: this.model,
-          max_tokens: 2048,
-          system: systemPrompt,
           messages: [
-            {
-              role: "user",
-              content: userMessage,
-            },
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage },
           ],
+          max_tokens: 2048,
+          temperature: 0,
         },
         {
           headers: {
-            "x-api-key": this.apiKey,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+            "Content-Type": "application/json",
           },
           timeout: 30000,
         }
       );
 
-      const content = response.data.content[0].text;
+      const content = response.data.choices[0].message.content;
 
       let issues = [];
       try {
-        issues = JSON.parse(content);
+        const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+        issues = JSON.parse(cleaned);
         console.log(`✅ Trovati ${issues.length} problemi in ${filePath}`);
       } catch (e) {
-        console.warn(`⚠️ Errore nel parsing della risposta Claude:`);
+        console.warn(`⚠️ Errore nel parsing risposta AI:`);
         console.warn(content);
         issues = [];
       }
@@ -85,13 +83,13 @@ Analyze these changes and return ONLY JSON array.`;
       if (error.response?.status === 429) {
         console.error("⏳ Rate limit raggiunto, aspetta un momento...");
       } else if (error.code === "ECONNABORTED") {
-        console.error("⏱️ Timeout nella richiesta a Claude");
+        console.error("⏱️ Timeout nella richiesta");
       } else {
-        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
+        console.error("❌ Errore AI API:", error.response?.data?.error || error.message);
       }
       return [];
     }
   }
 }
 
-export default ClaudeClient;
+export default AIClient;
