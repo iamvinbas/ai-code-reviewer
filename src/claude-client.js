@@ -1,15 +1,12 @@
-const axios = require("axios");
+import axios from "axios";
 
 class ClaudeClient {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.baseURL = "https://api.anthropic.com/v1";
+    this.baseURL = "https://api.anthropic.com/v1"\;
     this.model = "claude-3-5-sonnet-20241022";
   }
 
-  /**
-   * Analizza il codice e ritorna problemi trovati
-   */
   async reviewCode(filePath, diffContent) {
     const systemPrompt = `You are an expert code reviewer. Analyze the following code changes and identify issues.
 
@@ -67,13 +64,12 @@ Analyze these changes and return ONLY JSON array.`;
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
           },
-          timeout: 30000, // 30 secondi timeout
-        },
+          timeout: 30000,
+        }
       );
 
       const content = response.data.content[0].text;
 
-      // Parse JSON response
       let issues = [];
       try {
         issues = JSON.parse(content);
@@ -91,15 +87,11 @@ Analyze these changes and return ONLY JSON array.`;
       } else if (error.code === "ECONNABORTED") {
         console.error("⏱️ Timeout nella richiesta a Claude");
       } else {
-        console.error(
-          "❌ Errore Claude API:",
-          error.response?.data?.error || error.message,
-        );
+        console.error("❌ Errore Claude API:", error.response?.data?.error || error.message);
       }
-      // Ritorna array vuoto in caso di errore
       return [];
     }
   }
 }
 
-module.exports = ClaudeClient;
+export default ClaudeClient;

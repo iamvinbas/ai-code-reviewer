@@ -4,15 +4,11 @@ class CodeAnalyzer {
     this.claude = claudeClient;
   }
 
-  /**
-   * Analizza tutti i file nella PR
-   */
   async analyzePR(owner, repo, pull_number, commitSha) {
     console.log(`\n${"=".repeat(50)}`);
     console.log(`🔍 INIZIO ANALISI PR #${pull_number}`);
     console.log(`${"=".repeat(50)}\n`);
 
-    // 1. Scarica i cambiamenti
     const changes = await this.github.getPRChanges(owner, repo, pull_number);
 
     if (changes.length === 0) {
@@ -20,7 +16,6 @@ class CodeAnalyzer {
       return [];
     }
 
-    // 2. Per ogni file, chiama Claude
     const allIssues = [];
 
     for (const file of changes) {
@@ -35,13 +30,9 @@ class CodeAnalyzer {
           });
         }
       } catch (error) {
-        console.error(
-          `❌ Errore nell'analizzare ${file.filename}:`,
-          error.message,
-        );
+        console.error(`❌ Errore nell'analizzare ${file.filename}:`, error.message);
       }
 
-      // Rate limiting: aspetta un po' tra file
       await this.github.sleep(1000);
     }
 
@@ -49,20 +40,15 @@ class CodeAnalyzer {
     return allIssues;
   }
 
-  /**
-   * Posta i commenti delle review sulla PR
-   */
   async postReviewComments(owner, repo, pull_number, issues, commitSha) {
     console.log(`\n${"=".repeat(50)}`);
     console.log(`💬 POSTING COMMENTI`);
     console.log(`${"=".repeat(50)}\n`);
 
-    // Raggruppa per severity
     const critical = issues.filter((i) => i.severity === "critical");
     const warnings = issues.filter((i) => i.severity === "warning");
     const suggestions = issues.filter((i) => i.severity === "suggestion");
 
-    // Posta commenti per ogni issue
     let postedCount = 0;
 
     for (const issue of issues) {
@@ -75,7 +61,7 @@ class CodeAnalyzer {
           pull_number,
           commentBody,
           issue.line,
-          issue.filename,
+          issue.filename
         );
 
         postedCount++;
@@ -83,20 +69,15 @@ class CodeAnalyzer {
         console.error("❌ Errore nel postare commento:", error.message);
       }
 
-      // Rate limiting
       await this.github.sleep(500);
     }
 
-    // Posta summary comment
     const summaryBody = this.formatSummary(critical, warnings, suggestions);
     await this.github.postGeneralComment(owner, repo, pull_number, summaryBody);
 
     console.log(`\n✅ Postati ${postedCount} commenti\n`);
   }
 
-  /**
-   * Formatta un commento singolo
-   */
   formatComment(issue) {
     const severityEmoji = {
       critical: "🔴",
@@ -123,9 +104,6 @@ ${issue.explanation}
 </details>`;
   }
 
-  /**
-   * Formatta il commento riassuntivo
-   */
   formatSummary(critical, warnings, suggestions) {
     let body = `## 🤖 AI Code Review Summary\n\n`;
 
@@ -165,4 +143,4 @@ ${issue.explanation}
   }
 }
 
-module.exports = CodeAnalyzer;
+export default CodeAnalyzer;
