@@ -66,6 +66,10 @@ jobs:
 
 That's it. No secrets, no tokens, no billing.
 
+## Example
+
+![AI Code Review Summary](assets/review-summary.png)
+
 ## What it detects
 
 | Severity | Examples |
