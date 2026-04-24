@@ -3,7 +3,7 @@ import axios from "axios";
 class ClaudeClient {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.baseURL = "https://api.anthropic.com/v1"\;
+    this.baseURL = "https://api.anthropic.com/v1";
     this.model = "claude-3-5-sonnet-20241022";
   }
 
