@@ -1,0 +1,449 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fnil\fcharset0 HelveticaNeue;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red201\green206\blue214;\red238\green99\blue114;
+\red229\green232\blue236;\red0\green0\blue0;\red0\green0\blue0;\red0\green0\blue0;\red201\green206\blue214;
+}
+{\*\expandedcolortbl;;\cssrgb\c0\c1\c1;\cssrgb\c82854\c84426\c87068;\cssrgb\c95614\c48128\c51935;
+\cssrgb\c91876\c92662\c94116;\cssrgb\c0\c0\c0;\cssrgb\c0\c0\c0\c84706;\cssrgb\c0\c1\c1;\cssrgb\c82854\c84426\c87068;
+}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid1\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww22340\viewh16800\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs96 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec3 DEV.TO
+\fs24 \
+\
+#\cf2 \strokec4  \uc0\u55358 \u56598  I Built an AI Code Reviewer Bot for GitHub - Using Only GitHub Actions (No External APIs!)
+\f1\b0 \cf2 \strokec5 \
+\
+
+\f0\b \cf2 \strokec3 ##\cf2 \strokec4  TL;DR
+\f1\b0 \cf2 \strokec5 \
+I created a free, open-source GitHub Action that automatically reviews every pull request using GitHub's native capabilities. Zero external APIs, zero costs, 2-minute setup.\
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec3 **\cf2 \strokec5 GitHub:\cf2 \strokec3 **\cf2 \strokec5  [link]\
+\cf2 \strokec3 **\cf2 \strokec5 Stars:\cf2 \strokec3 **\cf2 \strokec5  \uc0\u11088  (please!)\
+\
+\cf2 \strokec3 ---\cf2 \strokec5 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 \strokec3 ##\cf2 \strokec4  The Problem
+\f1\b0 \cf2 \strokec5 \
+\
+Code reviews are slow, expensive, and inconsistent:\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec3 -\cf2 \strokec5  Junior devs miss security issues\
+\cf2 \strokec3 -\cf2 \strokec5  Teams can't afford dedicated reviewers\
+\cf2 \strokec3 -\cf2 \strokec5  Manual reviews take hours\
+\cf2 \strokec3 -\cf2 \strokec5  Knowledge isn't shared\
+\
+I wanted a bot that:\
+\uc0\u9989  Works with ONLY GitHub (no external services)\
+\uc0\u9989  Catches real bugs automatically\
+\uc0\u9989  Costs absolutely nothing\
+\uc0\u9989  Requires zero configuration\
+\
+\cf2 \strokec3 ---\cf2 \strokec5 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 \strokec3 ##\cf2 \strokec4  The Solution: AI Code Reviewer Bot
+\f1\b0 \cf2 \strokec5 \
+\
+A pure GitHub Action that:\
+\
+\uc0\u55357 \u56589  \cf2 \strokec3 **\cf2 \strokec5 Finds Security Issues\cf2 \strokec3 **\cf2 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec3 -\cf2 \strokec5  SQL Injection vulnerabilities\
+\cf2 \strokec3 -\cf2 \strokec5  Hardcoded secrets (passwords, API keys)\
+\cf2 \strokec3 -\cf2 \strokec5  Missing input validation\
+\cf2 \strokec3 -\cf2 \strokec5  Debug code left in production\
+\
+\uc0\u9889  \cf2 \strokec3 **\cf2 \strokec5 Instant Feedback\cf2 \strokec3 **\cf2 \strokec5 \
+\cf2 \strokec3 -\cf2 \strokec5  Reviews your PR in seconds\
+\cf2 \strokec3 -\cf2 \strokec5  Comments on specific lines\
+\cf2 \strokec3 -\cf2 \strokec5  Provides fix suggestions\
+\
+\uc0\u55357 \u56496  \cf2 \strokec3 **\cf2 \strokec5 Completely Free\cf2 \strokec3 **\cf2 \strokec5 \
+\cf2 \strokec3 -\cf2 \strokec5  Uses GitHub's native capabilities\
+\cf2 \strokec3 -\cf2 \strokec5  No external APIs\
+\cf2 \strokec3 -\cf2 \strokec5  No credit card\
+\cf2 \strokec3 -\cf2 \strokec5  Open source\
+\
+\cf2 \strokec3 ---\cf2 \strokec5 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 \strokec3 ##\cf2 \strokec4  How It Works
+\f1\b0 \cf2 \strokec5 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 You open a PR on GitHub \uc0\u8595 \
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 GitHub Action is triggered (built-in) \uc0\u8595 \
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 Bot downloads changed files from your repo \uc0\u8595 \
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	4	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 Bot analyzes the code using GitHub's native tools \uc0\u8595 \
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	5	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 Bot posts comments on your PR \uc0\u8595 \
+\ls1\ilvl0\cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	6	}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec6 You get instant feedback\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf2 \strokec7 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf2 \strokec5 \
+**Everything stays within GitHub. No external dependencies.**\
+\
+---\
+\
+## What Makes It Special\
+\
+Most code review bots require:\
+- External API keys\
+- Third-party services\
+- Credit cards\
+- Configuration\
+\
+This bot requires:\
+\uc0\u9989  Just GitHub (you already have it)\
+\uc0\u9989  Just the code (no secrets)\
+\uc0\u9989  Just a workflow file (copy/paste)\
+\
+---\
+\
+## Example\
+\
+When you open a PR with this code:\
+\
+```javascript\
+function getUserById(id) \{\
+  const query = "SELECT * FROM users WHERE id = " + id;\
+  return database.query(query);\
+\}\
+\
+const API_KEY = "sk-1234567890";\
+console.log("Debug");\
+```\
+\
+The bot will comment:\
+\pard\pardeftab720\sa240\partightenfactor0
+\cf2 \strokec6 \uc0\u55357 \u56628  CRITICAL SQL Injection vulnerability detected. User input is concatenated directly into SQL query.\
+Suggestion: Use parameterized queries db.query('SELECT * FROM users WHERE id = ?', [id])\
+Why? Concatenating user input allows attackers to execute arbitrary SQL.\
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf2 \strokec7 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf2 \strokec5 \
+---\
+\
+## 2-Minute Setup\
+\
+### 1. Copy Workflow File\
+Create `.github/workflows/review.yml` in your repo and copy the workflow file from this repo.\
+\
+### 2. Add Your Token (Already Built-In!)\
+The workflow uses GitHub's native `GITHUB_TOKEN` - no setup needed!\
+\
+### 3. Done!\
+Next PR = automatic review\
+\
+That's literally it. No API keys, no secrets, nothing.\
+\
+---\
+\
+## The Architecture\
+\pard\pardeftab720\sa240\partightenfactor0
+\cf2 \strokec6 Your GitHub Repo \uc0\u8595  PR opened \u8595  GitHub Action triggers (native) \u8595  Bot analyzes code \u8595  Bot comments on PR \u8595  Everything stays in GitHub \u9989 \
+\pard\pardeftab720\qc\partightenfactor0
+
+\f2\fs22 \cf2 \strokec7 \
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf2 \strokec5 \
+Zero external calls. Zero dependencies. Pure GitHub.\
+\
+---\
+\
+## Why This Is Different\
+\
+\uc0\u10060  **Other Solutions:**\
+- Require external APIs\
+- Need credit cards\
+- Add complexity\
+- Cost money\
+\
+\uc0\u9989  **This Solution:**\
+- Pure GitHub Actions\
+- Zero external dependencies\
+- Zero cost\
+- Dead simple\
+\
+---\
+\
+## Real World Example\
+\
+I tested this on actual projects and it:\
+- Caught a SQL injection in a user query\
+- Found hardcoded database passwords\
+- Spotted debug console.log() before production\
+- Suggested parameterized queries\
+- Improved team code quality\
+\
+All without leaving GitHub.\
+\
+---\
+\
+## Who Should Use This?\
+\
+- **Solo developers** - Free security scanning\
+- **Small teams** - No budget for expensive tools\
+- **Startups** - Keep costs at zero\
+- **Learning** - Understand code quality patterns\
+- **Portfolio** - Show security awareness\
+\
+---\
+\
+## GitHub Stats\
+\
+- \uc0\u11088  [X stars]\
+- \uc0\u55357 \u56384  [X forks]\
+- \uc0\u55357 \u56347  [X issues]\
+\
+---\
+\
+## Installation\
+\
+1. Go to your GitHub repo\
+2. Create `.github/workflows/review.yml`\
+3. Copy the workflow from: [GitHub repo link]\
+4. Save and commit\
+5. Open a PR - bot reviews automatically\
+\
+---\
+\
+## Next Steps\
+\
+1. Star the repo \uc0\u11088 \
+2. Try it on your project\
+3. Open an issue if you find bugs\
+4. Contribute improvements!\
+\
+---\
+\
+**Pure GitHub. Pure Open Source. Pure Free.** \uc0\u55357 \u56960 \
+\
+Built with \uc0\u10084 \u65039  - No external dependencies, no APIs, no costs.\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs96 \cf8 \outl0\strokewidth0 HACKER NEWS
+\f1\b0\fs24 \cf2 \outl0\strokewidth0 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+\
+Title: I built an AI code reviewer bot for GitHub - uses only GitHub Actions (no external APIs)\
+\
+Text:\
+Created a free GitHub Action that automatically reviews pull requests.\
+\
+What makes it different:\
+- No external APIs needed\
+- No credit cards required\
+- Works with GitHub's native token\
+- Pure open source\
+- Completely free\
+\
+Features:\
+- Detects SQL injection vulnerabilities\
+- Finds hardcoded secrets\
+- Flags missing input validation\
+- Comments directly on PRs with suggestions\
+\
+Everything stays within GitHub. One workflow file. Done.\
+\
+GitHub: [repo-link]\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs96 \cf0 \strokec6 Twitter Thread
+\f1\b0\fs24 \cf2 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+Tweet 1:\
+\uc0\u55358 \u56598  Just released: AI Code Reviewer Bot for GitHub\
+\
+Automatically reviews every PR using GitHub Actions.\
+- No external APIs\
+- No credit card\
+- Zero cost\
+- Pure open source\
+\
+Everything stays in GitHub.\
+\
+\uc0\u11088  GitHub: [link]\
+\
+---\
+\
+Tweet 2:\
+What's different about this:\
+\
+Other code review bots need:\
+\uc0\u10060  External APIs\
+\uc0\u10060  Credit cards\
+\uc0\u10060  Complex setup\
+\uc0\u10060  Monthly costs\
+\
+This bot needs:\
+\uc0\u9989  Just GitHub (you have it)\
+\uc0\u9989  One workflow file\
+\uc0\u9989  That's it\
+\
+---\
+\
+Tweet 3:\
+How it works:\
+\
+1. You open a PR on GitHub\
+2. GitHub Action triggers automatically\
+3. Bot analyzes your code\
+4. Bot comments with issues\
+5. Everything in GitHub \uc0\u9989 \
+\
+No external services. No API calls. Pure GitHub.\
+\
+---\
+\
+Tweet 4:\
+Real example of what it catches:\
+\
+Code with SQL injection:\
+const query = "SELECT * FROM users WHERE id = " + id;\
+\
+Bot catches it:\
+\uc0\u55357 \u56628  SQL Injection\
+Suggestion: Use parameterized queries\
+\
+All within GitHub.\
+\
+---\
+\
+Tweet 5:\
+Features:\
+\
+\uc0\u9989  Finds SQL injection vulnerabilities\
+\uc0\u9989  Detects hardcoded secrets\
+\uc0\u9989  Spots missing validation\
+\uc0\u9989  Comments on specific lines\
+\uc0\u9989  Suggests fixes\
+\
+No external dependencies.\
+\
+---\
+\
+Tweet 6:\
+Setup is literally 2 minutes:\
+\
+1. Copy .github/workflows/review.yml\
+2. Paste in your repo\
+3. Commit\
+4. Done\
+\
+Your next PR gets reviewed automatically.\
+\
+GitHub: [link]\
+\uc0\u11088  Would appreciate a star\
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs96 \cf0 \outl0\strokewidth0 REDDIT (\outl0\strokewidth0 \strokec6 r/github\outl0\strokewidth0 )
+\f1\b0\fs24 \cf2 \outl0\strokewidth0 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+\
+Title: Built an AI Code Reviewer Bot for GitHub - No External APIs (Pure Open Source)\
+\
+I created a GitHub Action that automatically reviews pull requests \
+for security vulnerabilities. Everything runs on GitHub Actions - \
+no external services, no APIs, no credit cards.\
+\
+How it works:\
+- Uses GitHub's native token\
+- Analyzes code within GitHub Actions\
+- Comments directly on PRs\
+- 100% free\
+\
+Features:\
+- Detects SQL injection, hardcoded secrets, missing validation\
+- 2-minute setup (copy one file)\
+- No configuration needed\
+- Open source\
+\
+GitHub: [link]\
+\
+Feedback welcome!\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs96 \cf0 \outl0\strokewidth0 (r/webdev)\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf0 Title: Built a Code Review Bot That Uses Only GitHub Actions (No APIs, No Costs)\
+\
+Created a GitHub Action that automatically reviews PRs for common security issues.\
+\
+What's unique:\
+- Doesn't rely on external services\
+- Uses GitHub's native capabilities\
+- Zero ongoing costs\
+- No API keys or credit cards needed\
+- Completely open source\
+\
+It catches things like SQL injection, hardcoded credentials, \
+and suggests fixes directly on your PR.\
+\
+All the logic stays within GitHub. Nothing external.\
+\
+GitHub: [link]\
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs96 \cf0 (r/learnprogramming)\
+
+\fs24 Title: I Built a Code Review Bot Using Only GitHub Actions\
+\
+Created a GitHub Action that automatically reviews code for security issues.\
+\
+Perfect for learning because it shows:\
+- How GitHub Actions work\
+- Code analysis patterns\
+- Security vulnerability detection\
+- Contributing to open source\
+\
+Everything is open source and free. No external APIs or dependencies.\
+\
+GitHub: [link]\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+}
