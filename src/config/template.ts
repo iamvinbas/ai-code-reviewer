@@ -1,0 +1,96 @@
+export function configTemplate(): string {
+  return `# acr — AI code reviewer configuration (https://github.com/iamvinbas/ai-code-reviewer)
+#
+# Commit this file so the whole team shares the same rules.
+# Precedence (later wins): built-in defaults < ~/.config/acr/config.yml < .acr.yml
+#                          < env (ACR_PROVIDER, ACR_MODEL, ACR_BASE_URL, ACR_LANGUAGE, ACR_FAIL_ON)
+#                          < command-line flags.
+# Run \`acr doctor\` to see which files are loaded and whether the provider is reachable.
+
+# ── AI provider ─────────────────────────────────────────────────────────────
+# Any OpenAI-compatible endpoint works. Presets:
+#   ollama            (default) local, free, private — your code never leaves the machine.
+#                     Install https://ollama.com, then: ollama pull qwen2.5-coder:14b
+#   groq              free tier, key in env GROQ_API_KEY        (https://console.groq.com/keys)
+#   gemini            free tier, key in env GEMINI_API_KEY      (https://aistudio.google.com/apikey)
+#   openrouter        free models, key in env OPENROUTER_API_KEY (https://openrouter.ai/keys)
+#   cerebras          free tier, key in env CEREBRAS_API_KEY    (https://cloud.cerebras.ai)
+#   openai-compatible any other endpoint: set baseUrl (+ apiKeyEnv if it needs a key)
+#
+# NEVER put API keys in this file. apiKeyEnv is the NAME of the environment
+# variable that holds the key (in a repo file it must end in _API_KEY).
+# Hosted providers receive the diff of your changes: check your team's policy.
+provider:
+  preset: ollama
+  # model: qwen2.5-coder:14b              # override the preset's default model
+  # baseUrl: http://localhost:11434/v1    # override the endpoint
+  # apiKeyEnv: MY_PROVIDER_API_KEY        # env var holding the key
+  # timeoutMs: 120000                     # per request; local models can be slow
+  #
+  # Ollama only: acr sizes the model's context window (num_ctx) to each request.
+  # To pin it instead (avoids model reloads), set the env var ACR_OLLAMA_NUM_CTX,
+  # e.g. ACR_OLLAMA_NUM_CTX=16384. It must fit maxChunkTokens plus the answer.
+  # maxRetries: 3
+
+# ── When to fail ────────────────────────────────────────────────────────────
+# Exit with code 1 (and block the git hook) if any issue is at least this severe:
+# critical | warning | suggestion | never
+failOn: critical
+
+# What to do when the review could not complete (provider down, bad response...):
+#   warn → print a warning and exit 0 (never blocks your commit because the AI is down)
+#   fail → exit with code 2
+onError: warn
+
+# ── Scope ───────────────────────────────────────────────────────────────────
+# Glob patterns (picomatch), relative to the repo root. Empty include = everything.
+include: []
+exclude:
+  # - "**/*.lock"
+  # - "dist/**"
+  # - "**/__snapshots__/**"
+
+# Hard cap on the number of files sent to the AI per review.
+maxFiles: 50
+# Token budget per AI request (diff + context); bigger diffs are split into chunks.
+# Trade-off: bigger chunks give the model more context per request, but local models
+# get much slower (a full 6000-token chunk takes ~1.5 min for qwen2.5-coder:14b on a
+# laptop, close to the request timeout). Hosted providers handle 8000+ comfortably.
+maxChunkTokens: 4000
+# Lines of surrounding code sent around each change for context.
+contextLines: 10
+
+# ── Team rules ──────────────────────────────────────────────────────────────
+# Conventions in plain language; the AI checks the diff against them.
+rules:
+  # - Use the logger from src/lib/log.ts instead of console.log.
+  # - Every new API route must validate its input with zod.
+  # - Do not use \`any\` in TypeScript; prefer \`unknown\` and narrow.
+  # - SQL must use parameterized queries, never string concatenation.
+
+# Language of the AI explanations: en | it
+language: en
+
+# ── AI and offline checks ───────────────────────────────────────────────────
+ai:
+  enabled: true        # false = only the fast offline checks below (same as --no-ai)
+
+checks:
+  secrets: true          # API keys, tokens, private keys (critical)
+  conflictMarkers: true  # leftover <<<<<<< / >>>>>>> (critical)
+  debugStatements: true  # console.log, debugger, print(, pdb...
+  largeFiles:
+    enabled: true
+    maxKb: 500
+
+# ── Cache ───────────────────────────────────────────────────────────────────
+# Unchanged chunks are not re-sent to the AI. Default dir: ~/.cache/acr
+cache:
+  enabled: true
+  # dir: .acr/cache      # if you use a repo-local dir, add it to .gitignore
+
+# ── Ignored issues ──────────────────────────────────────────────────────────
+# Issue ids to ignore. Prefer \`acr ignore <id>\`, which writes to .acr/ignore.
+ignore: []
+`;
+}

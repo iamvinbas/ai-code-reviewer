@@ -1,4 +1,8 @@
 node_modules/
 .env
 .DS_Store
-file utili/key.rtf
+dist/
+coverage/
+.acr/cache/
+
+file utili/
